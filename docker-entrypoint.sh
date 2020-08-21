@@ -41,15 +41,6 @@ bootstrap_conf(){
 
 	gosu discourse bundle config set DISCOURSE_REDIS_HOST "${REDIS_HOST}"
 	export DISCOURSE_REDIS_HOST="${REDIS_HOST}"
-	#gosu discourse bundle config set REDIS_HOST "${REDIS_HOST}"
-	#gosu discourse bundle config set DISCOURSE_REDIS_URL "${REDIS_HOST}"
-	#export DISCOURSE_REDIS_URL="${REDIS_HOST}"
-	#gosu discourse bundle config set REDIS_URL "${REDIS_HOST}"
-	#export REDIS_URL="${REDIS_HOST}"
-	#gosu discourse bundle config set REDIS_PROVIDER "${REDIS_HOST}"
-	#export REDIS_PROVIDER="${REDIS_HOST}"
-	#gosu discourse bundle config set DISCOURSE_REDIS_PROVIDER "${REDIS_HOST}"
-	#export DISCOURSE_REDIS_PROVIDER="${REDIS_HOST}"
 
 	gosu discourse bundle config set DISCOURSE_REDIS_PORT "${REDIS_PORT}"
 	export DISCOURSE_REDIS_PORT="${REDIS_PORT}"
@@ -57,7 +48,7 @@ bootstrap_conf(){
 	export DISCOURSE_REDIS_PASSWORD="${REDIS_PASSWORD}"
 
 	#gosu discourse bundle exec rake admin:create
-	#gosu discourse bundle exec rake user:create["name","email","password","admin"]
+	#gosu discourse bundle exec rake user:create["Admin","baltazar.tavares@gmai.com","password","admin"]
 }
 
 parse_env '/env.sh'
@@ -72,8 +63,16 @@ if [[ "start" == *"$1"* ]]; then
 	if [ ! "${DISCOURSE_DONT_INIT_DATABASE}" ] ; then
 		gosu discourse bundle exec rake db:create || echo 'ERROR: bundle exec rake db:create'
 		gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
+		#gosu discourse bash -c 'echo -e ${DISCOURSE_SU_EMAIL}\\n${DISCOURSE_SU_PASSWORD}\\n${DISCOURSE_SU_PASSWORD}\\nY | bundle exec rake admin:create'
+		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" | gosu discourse bundle exec rake admin:create
 	fi
-	gosu discourse bundle exec rake assets:precompile
+	if [ ! "${DISCOURSE_DONT_INIT_SU}" ] ; then
+		echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" \
+			| gosu discourse bundle exec rake admin:create
+	fi
+	if [ ! "${DISCOURSE_DONT_PRECOMPILE}" ] ; then
+		gosu discourse bundle exec rake assets:precompile
+	fi
 	#gosu discourse mailcatcher --http-ip 0.0.0.0
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
