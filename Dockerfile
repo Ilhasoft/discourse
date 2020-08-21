@@ -145,7 +145,7 @@ FROM base
 COPY --from=build /usr/local/bundle/ /usr/local/bundle/
 COPY --from=build --chown=discourse:discourse /app /app
 
-RUN if [ ! "x${NODE_BUILD_DEPS}" = "x" ] ; then apt-get update && apt-get install -y --no-install-recommends curl -y \
+RUN if [ ! "x${NODE_RUNTIME_DEPS}" = "x" ] ; then apt-get update && apt-get install -y --no-install-recommends curl -y \
  && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
  && apt-get install -y nodejs \
  && npm install -g ${NODE_RUNTIME_DEPS} ; fi
