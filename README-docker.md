@@ -169,17 +169,55 @@ Wait for it to initialize completely, and visit `http://swarm-ip:8080`, `http://
 
 # Environment
 
+We will show the key `ARG` and environments to build the image and to put it into production.
+
 ## Build Args
 
-> `ARG EXECJS_RUNTIME="Node"`
-> `ARG DISCOURSE_VERSION="v2.5.0"`
-> `ARG BUNDLE_JOBS=6`
+Most important arguments for building the image
+
+> `ARG DISCOURSE_VERSION`
+
+Version to download code from repository(**`master`, `v2.5.0`, etc...**).
+
 > `ARG BUILD_DEPS`
-> `ARG RUNTIME_DEPS=`
-> `ARG DISCOURSE_UID=500`
-> `ARG DISCOURSE_GID=500`
-> `ARG DISCOURSE_REPOSITORY_URL="https://github.com/discourse/discourse.git"`
-> `ARG DISCOURSE_PLUGINS=""`
+
+Debian packages to install on the build process.
+
+> `ARG RUNTIME_DEPS`
+
+Debian packages to install on runtime.
+
+> `ARG NODE_BUILD_DEPS`
+
+Node packages to install on the build process. If empty, `nodejs` will not be instaled.
+
+> `ARG NODE_RUNTIME_DEPS`
+
+Node packages to install on the runtime. If empty, `nodejs` will not be instaled.
+
+> `ARG DISCOURSE_REPOSITORY_URL`
+
+Git repository for clone and build **discourse** from source.
+
+> `ARG DISCOURSE_UID`
+
+**UID** of **discourse** on the image.
+
+> `ARG DISCOURSE_GID`
+
+**GID** of **discourse** on the image.
+
+> `ARG BUNDLE_JOBS`
+
+Threads used on `bundle install`.
+
+> `ARG EXECJS_RUNTIME="Node"`
+
+Used by `execjs` to compile front end code.
+
+> `ARG DISCOURSE_PLUGINS`
+
+Not used yet.
 
 ## Runtime environment
 
@@ -190,13 +228,26 @@ POSTGRES_PASSWORD=q39XPRR7oLOU
 POSTGRES_USER=discourse
 POSTGRES_DB_NAME=discourse
 
+DISCOURSE_HOSTNAME=localhost
 DISCOURSE_PORT=8080
 DISCOURSE_DONT_INIT_DATABASE=
 DISCOURSE_SU_EMAIL=admin@admin.com
 DISCOURSE_SU_PASSWORD=111sssDDDD
+DISCOURSE_DONT_INIT_DATABASE=""
+DISCOURSE_DONT_INIT_SU=""
+DISCOURSE_DONT_PRECOMPILE=""
+DISCOURSE_UID=${DISCOURSE_UID}
+DISCOURSE_GID=${DISCOURSE_GID}
+DISCOURSE_VERSION=${DISCOURSE_VERSION}
 
 REDIS_HOST=discourse-redis
 REDIS_PASSWORD=uSbUU8ZDVx
 REDIS_PORT=6379
+
+BUNDLE_JOBS=${BUNDLE_JOBS}
+REDIS_HOST=discourse-test-redis
+REDIS_PASSWORD=asdasdsZDVx
+REDIS_PORT=6379
+EXECJS_RUNTIME=${EXECJS_RUNTIME}
 ```
 

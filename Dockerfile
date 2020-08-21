@@ -9,7 +9,7 @@ ARG DISCOURSE_VERSION="v2.5.0"
 ARG BUNDLE_JOBS=6
 
 ARG NODE_BUILD_DEPS=""
-arg NODE_RUNTIME_DEPS="source-map commander svgo uglify-js"
+ARG NODE_RUNTIME_DEPS="source-map commander svgo uglify-js"
 
 ARG BUILD_DEPS="\
       build-essential \
@@ -106,13 +106,12 @@ LABEL discourse=${DISCOURSE_VERSION} \
     os.version="10" \
     name="Discourse ${DISCOURSE_VERSION}" \
     description="Discourse image" \
-    maintainer="Psycho Mantys"
+    maintainer="Ilhasoft Team"
 
 RUN addgroup --gid "${DISCOURSE_GID}" discourse \
  && useradd --system -m -d /app -u "${DISCOURSE_UID}" -g "${DISCOURSE_GID}" discourse
 
 WORKDIR /app
-
 
 FROM base AS build
 
@@ -123,12 +122,9 @@ RUN if [ ! "x${NODE_BUILD_DEPS}" = "x" ] ; then apt-get update \
  && npm install -g ${NODE_BUILD_DEPS} ; fi
 
 RUN apt-get update && apt-get install -y --no-install-recommends ${BUILD_DEPS}
-# && npm install svgo uglify-js@"<3" -g
 
 RUN cd / && rm -rf /app \
  && git clone --branch ${DISCOURSE_VERSION} https://github.com/discourse/discourse.git /app
-
-#RUN npm install -g svgo
 
 #RUN git remote set-branches --add origin tests-passed \
 # && bundle install --deployment --jobs 6 --without test development \
@@ -143,10 +139,7 @@ RUN git remote set-branches --add origin tests-passed \
  && bundle config set deployment 'true' \
  && bundle config set without 'test development' \
  && bundle install --jobs "${BUNDLE_JOBS}"
-# && bundle exec rake assets:precompile
  
-# && bundle clean --force
-
 FROM base
 
 COPY --from=build /usr/local/bundle/ /usr/local/bundle/
@@ -170,16 +163,13 @@ RUN apt-get update \
  && find /app /usr/local/bundle -name "*.o" -delete \
  && rm vendor/bundle/ruby/*/cache/*.gem
 
-#RUN apt-get update && apt-get install -y ${BUILD_DEPS} ${RUNTIME_DEPS}
-#RUN find /app -not -user discourse -exec chown discourse:discourse {} \+
-
 COPY docker-entrypoint.sh /
 COPY wait-for /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["start"]
-CMD sleep 6d
+CMD ["start"]
+#CMD sleep 6d
 
-#HEALTHCHECK --interval=1m --timeout=5s --start-period=90s \
+#HEALTHCHECK --interval=1m --timeout=5s --start-period=480s \
 #  CMD /docker-entrypoint.sh healthcheck
 

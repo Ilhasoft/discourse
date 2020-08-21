@@ -66,9 +66,10 @@ if [[ "start" == *"$1"* ]]; then
 		#gosu discourse bash -c 'echo -e ${DISCOURSE_SU_EMAIL}\\n${DISCOURSE_SU_PASSWORD}\\n${DISCOURSE_SU_PASSWORD}\\nY | bundle exec rake admin:create'
 		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" | gosu discourse bundle exec rake admin:create
 	fi
-	if [ ! "${DISCOURSE_DONT_INIT_SU}" ] ; then
+	if [ ! "${DISCOURSE_DONT_INIT_SU}" -a ! -r /discourse_su_created ] ; then
 		echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" \
 			| gosu discourse bundle exec rake admin:create
+		touch /discourse_su_created
 	fi
 	if [ ! "${DISCOURSE_DONT_PRECOMPILE}" ] ; then
 		gosu discourse bundle exec rake assets:precompile
