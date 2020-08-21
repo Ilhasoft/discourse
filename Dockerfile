@@ -70,8 +70,7 @@ ARG DISCOURSE_REPOSITORY_URL="https://github.com/discourse/discourse.git"
 ARG DISCOURSE_PLUGINS="\
     https://github.com/discourse/discourse-spoiler-alert"
 
-ENV 
-    RUBY_GC_MALLOC_LIMIT=90000000 \
+ENV RUBY_GC_MALLOC_LIMIT=90000000 \
     RUBY_GLOBAL_METHOD_CACHE_SIZE=131072 \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=true \
