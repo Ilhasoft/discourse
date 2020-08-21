@@ -12,7 +12,7 @@ Discourse is an open source Internet forum and mailing list management software 
 ## start a discourse instance
 
 ```console
-$ docker run --name discourse -e DISCOURSE_DB_HOST=10.0.0.10 -d psychomantys/discourse:2.5.0-buster-slim
+$ docker run --name discourse -e POSTGRES_HOST=10.0.0.10 -d psychomantys/discourse:2.5.0-buster-slim
 ```
 
 The default `discourse` will connect to a test `redis` and `postgres` servers.
