@@ -70,26 +70,14 @@ ARG DISCOURSE_REPOSITORY_URL="https://github.com/discourse/discourse.git"
 ARG DISCOURSE_PLUGINS="\
     https://github.com/discourse/discourse-spoiler-alert"
 
-ENV RAILS_ENV=production \
+ENV 
     RUBY_GC_MALLOC_LIMIT=90000000 \
     RUBY_GLOBAL_METHOD_CACHE_SIZE=131072 \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=true \
     BUNDLE_JOBS=${BUNDLE_JOBS} \
-    REDIS_HOST=discourse-test-redis \
-    REDIS_PASSWORD=asdasdsZDVx \
-    REDIS_PORT=6379 \
-    POSTGRES_HOST=discourse-test-db \
-    POSTGRES_PORT=5432 \
-    POSTGRES_PASSWORD=q39XPRR7oLOU \
-    POSTGRES_USER=discourse \
-    POSTGRES_DB_NAME=discourse \
-    DISCOURSE_PORT=8080 \
     DISCOURSE_DONT_INIT_DATABASE="" \
-    DISCOURSE_DONT_INIT_SU="" \
     DISCOURSE_DONT_PRECOMPILE="" \
-    DISCOURSE_SU_EMAIL=admin@admin.com \
-    DISCOURSE_SU_PASSWORD=KzFBZ3ghSE \
     DISCOURSE_SERVE_STATIC_ASSETS=true \
     DISCOURSE_UID=${DISCOURSE_UID} \
     DISCOURSE_GID=${DISCOURSE_GID} \
@@ -100,6 +88,20 @@ ENV RAILS_ENV=production \
     NODE_RUNTIME_DEPS=${NODE_RUNTIME_DEPS} \
     BUILD_DEPS=${BUILD_DEPS} \
     RUNTIME_DEPS=${RUNTIME_DEPS}
+
+#    DISCOURSE_SU_EMAIL=admin@admin.com \
+#    DISCOURSE_SU_PASSWORD=KzFBZ3ghSE \
+#    RAILS_ENV=production \
+#    REDIS_HOST=discourse-test-redis \
+#    REDIS_PASSWORD=asdasdsZDVx \
+#    REDIS_PORT=6379 \
+#    POSTGRES_HOST=discourse-test-db \
+#    POSTGRES_PORT=5432 \
+#    POSTGRES_PASSWORD=q39XPRR7oLOU \
+#    POSTGRES_USER=discourse \
+#    POSTGRES_DB_NAME=discourse \
+#    DISCOURSE_DONT_INIT_SU="" \
+#    DISCOURSE_PORT=8080 \
 
 LABEL discourse=${DISCOURSE_VERSION} \
     os="debian" \
@@ -167,8 +169,8 @@ COPY docker-entrypoint.sh /
 COPY wait-for /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["start"]
-#CMD sleep 6d
+#CMD ["start"]
+CMD sleep 6d
 
 #HEALTHCHECK --interval=1m --timeout=5s --start-period=480s \
 #  CMD /docker-entrypoint.sh healthcheck
