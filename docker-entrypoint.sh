@@ -62,7 +62,6 @@ if [[ "start" == *"$1"* ]]; then
 	#exec gosu discourse bundle exec rake assets:precompile
 	if [ ! "${DISCOURSE_DONT_INIT_DATABASE}" ] ; then
 		gosu discourse bundle exec rake db:create || echo 'ERROR: bundle exec rake db:create'
-		gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
 		#gosu discourse bash -c 'echo -e ${DISCOURSE_SU_EMAIL}\\n${DISCOURSE_SU_PASSWORD}\\n${DISCOURSE_SU_PASSWORD}\\nY | bundle exec rake admin:create'
 		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" | gosu discourse bundle exec rake admin:create
 	fi
@@ -74,6 +73,7 @@ if [[ "start" == *"$1"* ]]; then
 	if [ ! "${DISCOURSE_DONT_PRECOMPILE}" ] ; then
 		gosu discourse bundle exec rake assets:precompile
 	fi
+	gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
 	#gosu discourse mailcatcher --http-ip 0.0.0.0
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
