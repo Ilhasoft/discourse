@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 #replace_conf(){
 #	for arg in "$@" ; do
