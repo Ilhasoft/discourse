@@ -62,19 +62,24 @@ if [[ "start" == *"$1"* ]]; then
 	#exec gosu discourse bundle exec rake assets:precompile
 	if [ ! "${DISCOURSE_DONT_INIT_DATABASE}" ] ; then
 		gosu discourse bundle exec rake db:create || echo 'ERROR: bundle exec rake db:create'
-		#gosu discourse bash -c 'echo -e ${DISCOURSE_SU_EMAIL}\\n${DISCOURSE_SU_PASSWORD}\\n${DISCOURSE_SU_PASSWORD}\\nY | bundle exec rake admin:create'
-		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" | gosu discourse bundle exec rake admin:create
 	fi
-	if [ ! "${DISCOURSE_DONT_INIT_SU}" -a ! -r /discourse_su_created ] ; then
+	gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
+
+	if [ ! "${DISCOURSE_DONT_INIT_SU}" -a ! -f /discourse_su_created ] ; then
+		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY"
 		echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" \
 			| gosu discourse bundle exec rake admin:create
 		touch /discourse_su_created
 	fi
+
+	if [ "${DISCOURSE_DISABLE_CSP}" = "true" ] ; then
+		echo 'SiteSetting.content_security_policy = false' | /docker-entrypoint.sh bundle exec rails c
+	fi
 	if [ ! "${DISCOURSE_DONT_PRECOMPILE}" ] ; then
 		gosu discourse bundle exec rake assets:precompile
 	fi
-	gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
 	#gosu discourse mailcatcher --http-ip 0.0.0.0
+	gosu discourse bundle exec sidekiq &
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
 	bootstrap_conf

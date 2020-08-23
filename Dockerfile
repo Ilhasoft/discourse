@@ -58,6 +58,7 @@ ARG RUNTIME_DEPS="\
       gosu \
       postgresql-client \
       imagemagick \
+      sendmail \
       nodejs \
       brotli"
 #      uglifyjs \
@@ -70,7 +71,8 @@ ARG DISCOURSE_REPOSITORY_URL="https://github.com/discourse/discourse.git"
 ARG DISCOURSE_PLUGINS="\
     https://github.com/discourse/discourse-spoiler-alert"
 
-ENV RUBY_GC_MALLOC_LIMIT=90000000 \
+ENV RAILS_ENV=production \
+    RUBY_GC_MALLOC_LIMIT=90000000 \
     RUBY_GLOBAL_METHOD_CACHE_SIZE=131072 \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=true \
@@ -90,7 +92,6 @@ ENV RUBY_GC_MALLOC_LIMIT=90000000 \
 
 #    DISCOURSE_SU_EMAIL=admin@admin.com \
 #    DISCOURSE_SU_PASSWORD=KzFBZ3ghSE \
-#    RAILS_ENV=production \
 #    REDIS_HOST=discourse-test-redis \
 #    REDIS_PASSWORD=asdasdsZDVx \
 #    REDIS_PORT=6379 \
@@ -162,14 +163,15 @@ RUN apt-get update \
  && rm -rf /usr/local/bundle/cache/*.gem \
  && find /app /usr/local/bundle -name "*.c" -delete \
  && find /app /usr/local/bundle -name "*.o" -delete \
+ && rm -rf .git \
  && rm vendor/bundle/ruby/*/cache/*.gem
 
 COPY docker-entrypoint.sh /
 COPY wait-for /
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD ["start"]
-CMD sleep 6d
+CMD ["start"]
+#CMD sleep 6d
 
 #HEALTHCHECK --interval=1m --timeout=5s --start-period=480s \
 #  CMD /docker-entrypoint.sh healthcheck
