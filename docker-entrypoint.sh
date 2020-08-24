@@ -46,9 +46,6 @@ bootstrap_conf(){
 	export DISCOURSE_REDIS_PORT="${REDIS_PORT}"
 	gosu discourse bundle config set DISCOURSE_REDIS_PASSWORD "${REDIS_PASSWORD}"
 	export DISCOURSE_REDIS_PASSWORD="${REDIS_PASSWORD}"
-
-	#gosu discourse bundle exec rake admin:create
-	#gosu discourse bundle exec rake user:create["Admin","baltazar.tavares@gmai.com","password","admin"]
 }
 
 parse_env '/env.sh'
