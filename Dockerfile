@@ -35,6 +35,7 @@ ARG BUILD_DEPS="\
       gifsicle \
       pngquant"
 ARG RUNTIME_DEPS="\
+      git \
       uglifyjs \
       jpegoptim \
       optipng \
