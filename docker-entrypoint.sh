@@ -51,6 +51,19 @@ bootstrap_conf(){
 		gosu discourse bundle config set DISCOURSE_REDIS_DB "${REDIS_DB}"
 		export DISCOURSE_REDIS_DB="${REDIS_DB}"
 	fi
+
+	gosu discourse bundle config set DISCOURSE_SMTP_ADDRESS "${SMTP_HOST}"
+	export DISCOURSE_SMTP_ADDRESS="${SMTP_HOST}"
+	gosu discourse bundle config set DISCOURSE_SMTP_PORT "${SMTP_PORT}"
+	export DISCOURSE_SMTP_PORT="${SMTP_PORT}"
+	gosu discourse bundle config set DISCOURSE_SMTP_USER_NAME "${SMTP_USER}"
+	export DISCOURSE_SMTP_USER_NAME="${SMTP_USER}"
+	gosu discourse bundle config set DISCOURSE_SMTP_PASSWORD "${SMTP_PASSWORD}"
+	export DISCOURSE_SMTP_PASSWORD="${SMTP_PASSWORD}"
+	gosu discourse bundle config set DISCOURSE_SMTP_AUTHENTICATION "${SMTP_AUTHENTICATION}"
+	export DISCOURSE_SMTP_AUTHENTICATION="${SMTP_AUTHENTICATION}"
+	gosu discourse bundle config set DISCOURSE_SMTP_ENABLE_START_TLS "${SMTP_ENABLE_START_TLS}"
+	export DISCOURSE_SMTP_ENABLE_START_TLS="${SMTP_ENABLE_START_TLS}"
 }
 
 parse_env '/env.sh'
