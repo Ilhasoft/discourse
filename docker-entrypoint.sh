@@ -41,11 +41,16 @@ bootstrap_conf(){
 
 	gosu discourse bundle config set DISCOURSE_REDIS_HOST "${REDIS_HOST}"
 	export DISCOURSE_REDIS_HOST="${REDIS_HOST}"
-
 	gosu discourse bundle config set DISCOURSE_REDIS_PORT "${REDIS_PORT}"
 	export DISCOURSE_REDIS_PORT="${REDIS_PORT}"
-	gosu discourse bundle config set DISCOURSE_REDIS_PASSWORD "${REDIS_PASSWORD}"
-	export DISCOURSE_REDIS_PASSWORD="${REDIS_PASSWORD}"
+	if [ -z ${REDIS_PASSWORD+x} ] ; then
+		gosu discourse bundle config set DISCOURSE_REDIS_PASSWORD "${REDIS_PASSWORD}"
+		export DISCOURSE_REDIS_PASSWORD="${REDIS_PASSWORD}"
+	fi
+	if [ -z ${REDIS_DB+x} ] ; then
+		gosu discourse bundle config set DISCOURSE_REDIS_DB "${REDIS_DB}"
+		export DISCOURSE_REDIS_DB="${REDIS_DB}"
+	fi
 }
 
 parse_env '/env.sh'
@@ -57,12 +62,12 @@ if [[ "start" == *"$1"* ]]; then
 	bootstrap_conf
 
 	#exec gosu discourse bundle exec rake assets:precompile
-	if [ ! "${DISCOURSE_DONT_INIT_DATABASE}" ] ; then
+	if [ "${DISCOURSE_DONT_INIT_DATABASE}" != "true" ] ; then
 		gosu discourse bundle exec rake db:create || echo 'ERROR: bundle exec rake db:create'
 	fi
 	gosu discourse bundle exec rake db:migrate || echo 'ERROR: bundle exec rake db:migrate'
 
-	if [ ! "${DISCOURSE_DONT_INIT_SU}" -a ! -f /discourse_su_created ] ; then
+	if [ "${DISCOURSE_DONT_INIT_SU}" != "true" -a ! -f /discourse_su_created ] ; then
 		#echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY"
 		echo -e "${DISCOURSE_SU_EMAIL}\n${DISCOURSE_SU_PASSWORD}\n${DISCOURSE_SU_PASSWORD}\nY" \
 			| gosu discourse bundle exec rake admin:create
@@ -72,7 +77,7 @@ if [[ "start" == *"$1"* ]]; then
 	if [ "${DISCOURSE_DISABLE_CSP}" = "true" ] ; then
 		echo 'SiteSetting.content_security_policy = false' | /docker-entrypoint.sh bundle exec rails c
 	fi
-	if [ ! "${DISCOURSE_DONT_PRECOMPILE}" ] ; then
+	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" ] ; then
 		gosu discourse bundle exec rake assets:precompile
 	fi
 	#gosu discourse mailcatcher --http-ip 0.0.0.0

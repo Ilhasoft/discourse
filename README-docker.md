@@ -221,33 +221,86 @@ Not used yet.
 
 ## Runtime environment
 
+Environment who change the behavior of the container on runtime. Just change and re-run the container.
+
+> `DISCOURSE_HOSTNAME`
+
+Hostname used by the discourse. It is important, because it is used sometimes for some redicts for example.
+
+> `DISCOURSE_PORT=8080`
+
+Port discourse will bind internally.
+
+> `DISCOURSE_SU_EMAIL=admin@admin.com`
+
+Email of the user to be created as an admin user of discourse. This email is optional, user does not need to be created.
+
+> `DISCOURSE_SU_PASSWORD=PASSWD_DISCOURSE_CHANGEME`
+
+Password for admins user to be created. This password is optional, user does not need to be created.
+
+> `DISCOURSE_DONT_INIT_SU=""`
+
+Dont create admin user of discourse if equal do "true".
+
+> `DISCOURSE_DONT_INIT_DATABASE=""`
+
+Dont create basic tables of discourse on database if equal do "true".
+
+> `DISCOURSE_DONT_PRECOMPILE=""`
+
+Dont run `bundle exec rake assets:precompile` create admin user of discourse if equal do "true".
+
+> `REDIS_HOST=server-redis-hostname`
+
+Redis server host address.
+
+> `REDIS_PORT=6379`
+
+Redis server port.
+
+> `REDIS_PASSWORD=PASSWD_REDIS_CHANGEME`
+
+Password for redis server.
+
+> `POSTGRES_HOST=server-postgres-hostname`
+
+Hostname of database.
+
+> `POSTGRES_PORT=5432`
+
+Database port of database.
+
+> `POSTGRES_PASSWORD=PASSWD_POSTGRES_CHANGEME`
+
+Password used by database.
+
+> `POSTGRES_USER=postgres_user`
+
+Username used by database.
+
+> `POSTGRES_DB_NAME=${POSTGRES_USER}`
+
+Name of database used.
+
+> `DISCOURSE_UID=${DISCOURSE_UID}`
+
+**UID** of discourse user to run.
+
+> `DISCOURSE_GID=${DISCOURSE_GID}`
+
+**GID** of discourse user to run.
+
+## Less used Environment
+
 ```bash
-POSTGRES_HOST=discourse-db
-POSTGRES_PORT=5432
-POSTGRES_PASSWORD=q39XPRR7oLOU
-POSTGRES_USER=discourse
-POSTGRES_DB_NAME=discourse
-
-DISCOURSE_HOSTNAME=localhost
-DISCOURSE_PORT=8080
-DISCOURSE_DONT_INIT_DATABASE=
-DISCOURSE_SU_EMAIL=admin@admin.com
-DISCOURSE_SU_PASSWORD=111sssDDDD
-DISCOURSE_DONT_INIT_DATABASE=""
-DISCOURSE_DONT_INIT_SU=""
-DISCOURSE_DONT_PRECOMPILE=""
-DISCOURSE_UID=${DISCOURSE_UID}
-DISCOURSE_GID=${DISCOURSE_GID}
-DISCOURSE_VERSION=${DISCOURSE_VERSION}
-
-REDIS_HOST=discourse-redis
-REDIS_PASSWORD=uSbUU8ZDVx
-REDIS_PORT=6379
-
-BUNDLE_JOBS=${BUNDLE_JOBS}
-REDIS_HOST=discourse-test-redis
-REDIS_PASSWORD=asdasdsZDVx
-REDIS_PORT=6379
 EXECJS_RUNTIME=${EXECJS_RUNTIME}
+BUNDLE_JOBS=${BUNDLE_JOBS}
+RAILS_ENV=production
+RUBY_GC_MALLOC_LIMIT=90000000
+RUBY_GLOBAL_METHOD_CACHE_SIZE=131072
+RAILS_LOG_TO_STDOUT=true
+RAILS_SERVE_STATIC_FILES=true
+DISCOURSE_SERVE_STATIC_ASSETS=true
 ```
 

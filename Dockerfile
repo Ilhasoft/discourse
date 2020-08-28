@@ -34,7 +34,6 @@ ARG BUILD_DEPS="\
       optipng \
       gifsicle \
       pngquant"
-#      uglifyjs \
 ARG RUNTIME_DEPS="\
       uglifyjs \
       jpegoptim \
@@ -61,7 +60,6 @@ ARG RUNTIME_DEPS="\
       sendmail \
       nodejs \
       brotli"
-#      uglifyjs \
 
 ARG DISCOURSE_UID=500
 ARG DISCOURSE_GID=500
@@ -77,54 +75,31 @@ ENV RAILS_ENV=production \
     RAILS_LOG_TO_STDOUT=true \
     RAILS_SERVE_STATIC_FILES=true \
     BUNDLE_JOBS=${BUNDLE_JOBS} \
+    DISCOURSE_PORT=8080 \
+    DISCOURSE_SU_EMAIL=admin@admin.com \
+    DISCOURSE_SU_PASSWORD=PASSWD_DISCOURSE_CHANGEME \
     DISCOURSE_DONT_INIT_DATABASE="" \
     DISCOURSE_DONT_PRECOMPILE="" \
+    DISCOURSE_DONT_INIT_SU="" \
     DISCOURSE_SERVE_STATIC_ASSETS=true \
     DISCOURSE_UID=${DISCOURSE_UID} \
     DISCOURSE_GID=${DISCOURSE_GID} \
     DISCOURSE_REPOSITORY_URL=${DISCOURSE_REPOSITORY_URL} \
     DISCOURSE_VERSION=${DISCOURSE_VERSION} \
+    REDIS_HOST=server-redis-hostname \
+    REDIS_PORT=6379 \
+    REDIS_PASSWORD=PASSWD_REDIS_CHANGEME \
+    POSTGRES_HOST=server-postgres-hostname \
+    POSTGRES_PORT=5432 \
+    POSTGRES_PASSWORD=PASSWD_POSTGRES_CHANGEME \
+    POSTGRES_USER=postgres_user \
+    POSTGRES_DB_NAME=${POSTGRES_USER} \
     EXECJS_RUNTIME=${EXECJS_RUNTIME} \
     NODE_BUILD_DEPS=${NODE_BUILD_DEPS} \
     NODE_RUNTIME_DEPS=${NODE_RUNTIME_DEPS} \
     BUILD_DEPS=${BUILD_DEPS} \
     RUNTIME_DEPS=${RUNTIME_DEPS}
 
-ARG DISCOURSE_SU_EMAIL=admin@admin.com
-ENV DISCOURSE_SU_EMAIL=${DISCOURSE_SU_EMAIL}
-
-ARG DISCOURSE_SU_PASSWORD=KzFBZ3ghSE
-ENV DISCOURSE_SU_PASSWORD=${DISCOURSE_SU_PASSWORD}
-
-ARG REDIS_HOST=discourse-test-redis
-ENV REDIS_HOST=${REDIS_HOST}
-
-ARG REDIS_PASSWORD=asdasdsZDVx
-ENV REDIS_PASSWORD=${REDIS_PASSWORD}
-
-ARG REDIS_PORT=6379
-ENV REDIS_PORT=${REDIS_PORT}
-
-ARG POSTGRES_HOST=discourse-test-db
-ENV POSTGRES_HOST=${POSTGRES_HOST}
-
-ARG POSTGRES_PORT=5432
-ENV POSTGRES_PORT=${POSTGRES_PORT}
-
-ARG POSTGRES_PASSWORD=q39XPRR7oLOU
-ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-
-ARG POSTGRES_USER=discourse
-ENV POSTGRES_USER=${POSTGRES_USER}
-
-ARG POSTGRES_DB_NAME=discourse
-ENV POSTGRES_DB_NAME=${POSTGRES_DB_NAME}
-
-ARG DISCOURSE_DONT_INIT_SU=""
-ENV DISCOURSE_DONT_INIT_SU=${DISCOURSE_DONT_INIT_SU}
-
-ARG DISCOURSE_PORT=8080
-ENV DISCOURSE_PORT=${DISCOURSE_PORT}
 
 LABEL discourse=${DISCOURSE_VERSION} \
     os="debian" \
@@ -149,14 +124,9 @@ RUN if [ ! "x${NODE_BUILD_DEPS}" = "x" ] ; then apt-get update \
 RUN apt-get update && apt-get install -y --no-install-recommends ${BUILD_DEPS}
 
 RUN cd / && rm -rf /app \
- && git clone --branch ${DISCOURSE_VERSION} https://github.com/discourse/discourse.git /app
-
-#RUN git remote set-branches --add origin tests-passed \
-# && bundle install --deployment --jobs 6 --without test development \
-# && bundle exec rake maxminddb:get \
-# && find /app/vendor/bundle -name tmp -type d -exec rm -rf {} +
-
-RUN git remote set-branches --add origin tests-passed \
+ && git clone --branch ${DISCOURSE_VERSION} https://github.com/discourse/discourse.git /app \
+ && cd /app \
+ && git remote set-branches --add origin tests-passed \
  && sed -i 's/daemonize true/daemonize false/g' ./config/puma.rb \
  && sed -i 's;/home/discourse/discourse;/app;g' ./config/puma.rb \
  && mkdir -p "tmp/pids" "tmp/sockets" \
@@ -165,12 +135,16 @@ RUN git remote set-branches --add origin tests-passed \
  && bundle config set without 'test development' \
  && bundle install --jobs "${BUNDLE_JOBS}"
  
+# && bundle install --deployment --jobs 6 --without test development \
+# && bundle exec rake maxminddb:get \
+
 FROM base
 
 COPY --from=build /usr/local/bundle/ /usr/local/bundle/
 COPY --from=build --chown=discourse:discourse /app /app
 
-RUN if [ ! "x${NODE_RUNTIME_DEPS}" = "x" ] ; then apt-get update && apt-get install -y --no-install-recommends curl -y \
+RUN if [ ! "x${NODE_RUNTIME_DEPS}" = "x" ] ; then apt-get update \
+ && apt-get install -y --no-install-recommends curl -y \
  && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
  && apt-get install -y nodejs \
  && npm install -g ${NODE_RUNTIME_DEPS} ; fi
@@ -196,6 +170,6 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["start"]
 #CMD sleep 6d
 
-#HEALTHCHECK --interval=1m --timeout=5s --start-period=480s \
+#HEALTHCHECK --interval=1m --timeout=5s --start-period=600s \
 #  CMD /docker-entrypoint.sh healthcheck
 
