@@ -5,7 +5,7 @@ FROM ruby:2.7.1-slim-buster AS base
 
 #ARG DISCOURSE_VERSION="master"
 ARG EXECJS_RUNTIME="Node"
-ARG DISCOURSE_VERSION="v2.5.0"
+ARG DISCOURSE_VERSION="v2.5.1"
 ARG BUNDLE_JOBS=6
 
 ARG NODE_BUILD_DEPS=""
@@ -131,7 +131,7 @@ RUN cd / && rm -rf /app \
  && rm -rf .git \
  && sed -i 's/daemonize true/daemonize false/g' ./config/puma.rb \
  && sed -i 's;/home/discourse/discourse;/app;g' ./config/puma.rb \
- && mkdir -p "tmp/pids" "tmp/sockets" \
+ && mkdir -p "tmp/pids" "tmp/sockets" "public/uploads/default" \
  && bundle config build.nokogiri --use-system-libraries \
  && bundle config set deployment 'true' \
  && bundle config set without 'test development' \

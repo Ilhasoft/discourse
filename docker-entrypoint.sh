@@ -91,14 +91,15 @@ if [[ "start" == *"$1"* ]]; then
 	if [ "${DISCOURSE_DISABLE_CSP}" = "true" ] ; then
 		echo 'SiteSetting.content_security_policy = false' | /docker-entrypoint.sh bundle exec rails c
 	fi
-	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" ] ; then
+	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" -a ! -f /discourse_precompiled ] ; then
 		gosu discourse bundle exec rake assets:precompile
+		touch /discourse_precompiled
 	fi
 	#gosu discourse mailcatcher --http-ip 0.0.0.0
 
 	tail -f log/* &
 
-	gosu discourse bundle exec sidekiq -v &
+	gosu discourse bundle exec sidekiq -v -L /dev/stdout &
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
 	bootstrap_conf
