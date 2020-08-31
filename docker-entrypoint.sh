@@ -21,6 +21,7 @@ parse_env(){
 }
 
 bootstrap_conf(){
+	touch log/{production.log,puma.err.log,puma.log}
 	# Fixing permissions
 	find /app -not -user discourse -exec chown discourse:discourse {} \+
 
@@ -43,11 +44,11 @@ bootstrap_conf(){
 	export DISCOURSE_REDIS_HOST="${REDIS_HOST}"
 	gosu discourse bundle config set DISCOURSE_REDIS_PORT "${REDIS_PORT}"
 	export DISCOURSE_REDIS_PORT="${REDIS_PORT}"
-	if [ -z ${REDIS_PASSWORD+x} ] ; then
+	if [ "${REDIS_PASSWORD}" ] ; then
 		gosu discourse bundle config set DISCOURSE_REDIS_PASSWORD "${REDIS_PASSWORD}"
 		export DISCOURSE_REDIS_PASSWORD="${REDIS_PASSWORD}"
 	fi
-	if [ -z ${REDIS_DB+x} ] ; then
+	if [ "${REDIS_DB}" ] ; then
 		gosu discourse bundle config set DISCOURSE_REDIS_DB "${REDIS_DB}"
 		export DISCOURSE_REDIS_DB="${REDIS_DB}"
 	fi
@@ -94,7 +95,10 @@ if [[ "start" == *"$1"* ]]; then
 		gosu discourse bundle exec rake assets:precompile
 	fi
 	#gosu discourse mailcatcher --http-ip 0.0.0.0
-	gosu discourse bundle exec sidekiq &
+
+	tail -f log/* &
+
+	gosu discourse bundle exec sidekiq -v &
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
 	bootstrap_conf
@@ -105,5 +109,6 @@ elif [[ "healthcheck" == "$1" ]]; then
 	exit 0
 fi
 
+bootstrap_conf
 exec "$@"
 

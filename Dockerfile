@@ -128,6 +128,7 @@ RUN cd / && rm -rf /app \
  && git clone --branch ${DISCOURSE_VERSION} https://github.com/discourse/discourse.git /app \
  && cd /app \
  && git remote set-branches --add origin tests-passed \
+ && rm -rf .git \
  && sed -i 's/daemonize true/daemonize false/g' ./config/puma.rb \
  && sed -i 's;/home/discourse/discourse;/app;g' ./config/puma.rb \
  && mkdir -p "tmp/pids" "tmp/sockets" \
@@ -161,7 +162,6 @@ RUN apt-get update \
  && rm -rf /usr/local/bundle/cache/*.gem \
  && find /app /usr/local/bundle -name "*.c" -delete \
  && find /app /usr/local/bundle -name "*.o" -delete \
- && rm -rf .git \
  && rm vendor/bundle/ruby/*/cache/*.gem
 
 COPY docker-entrypoint.sh /
