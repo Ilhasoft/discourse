@@ -99,7 +99,11 @@ if [[ "start" == *"$1"* ]]; then
 
 	tail -f log/* &
 
-	gosu discourse bundle exec sidekiq -v -L /dev/stdout &
+	(
+		while true ; do
+			gosu discourse bundle exec sidekiq -v -L /dev/stdout -c 5
+		done
+	) &
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
 	bootstrap_conf
