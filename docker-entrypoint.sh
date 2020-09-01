@@ -101,7 +101,7 @@ if [[ "start" == *"$1"* ]]; then
 
 	(
 		while true ; do
-			gosu discourse bundle exec sidekiq -v -L /dev/stdout -c 3
+			gosu discourse bundle exec sidekiq -v -L /dev/stdout
 		done
 	) &
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
