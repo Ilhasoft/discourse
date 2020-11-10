@@ -101,9 +101,13 @@ if [[ "start" == *"$1"* ]]; then
 
 	(
 		while true ; do
-			gosu discourse bundle exec sidekiq -v -L /dev/stdout
+			gosu discourse bundle config set RAILS_MAX_THREADS 3
+			RAILS_MAX_THREADS=3 gosu discourse bundle exec sidekiq -c 2 -v -L /dev/stdout -C config/sidekiq.yml -q low,2 -q critical,8 -q default,4 -q ultra_low
 		done
 	) &
+
+	sed -i s'/8, 32/4, 16/' config/puma.rb
+
 	exec gosu discourse bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "bundle" == "$1" ]]; then
 	bootstrap_conf
