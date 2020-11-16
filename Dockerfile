@@ -59,6 +59,7 @@ ARG RUNTIME_DEPS="\
       postgresql-client \
       imagemagick \
       sendmail \
+      curl \
       nodejs \
       brotli"
 
