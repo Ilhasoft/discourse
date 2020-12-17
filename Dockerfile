@@ -5,7 +5,7 @@ FROM ruby:2.7.1-slim-buster AS base
 
 #ARG DISCOURSE_VERSION="master"
 ARG EXECJS_RUNTIME="Node"
-ARG DISCOURSE_VERSION="v2.5.1"
+ARG DISCOURSE_VERSION="v2.5.6"
 ARG BUNDLE_JOBS=6
 
 ARG NODE_BUILD_DEPS=""
@@ -129,7 +129,6 @@ RUN cd / && rm -rf /app \
  && git clone --branch ${DISCOURSE_VERSION} https://github.com/discourse/discourse.git /app \
  && cd /app \
  && git remote set-branches --add origin tests-passed \
- && rm -rf .git \
  && sed -i 's/daemonize true/daemonize false/g' ./config/puma.rb \
  && sed -i 's;/home/discourse/discourse;/app;g' ./config/puma.rb \
  && mkdir -p "tmp/pids" "tmp/sockets" "public/uploads/default" \
@@ -137,6 +136,7 @@ RUN cd / && rm -rf /app \
  && bundle config set deployment 'true' \
  && bundle config set without 'test development' \
  && bundle install --jobs "${BUNDLE_JOBS}"
+# && rm -rf .git \
  
 # && bundle install --deployment --jobs 6 --without test development \
 # && bundle exec rake maxminddb:get \
