@@ -72,10 +72,11 @@ bootstrap_conf(){
 parse_env '/env.sh'
 parse_env '/run/secrets/env.sh'
 
+bootstrap_conf
+
 if [[ "start" == *"$1"* ]]; then
 	/wait-for "${POSTGRES_HOST}:${POSTGRES_PORT}" -- echo DB "${POSTGRES_HOST}:${POSTGRES_PORT}" started
 	/wait-for "${REDIS_HOST}:${REDIS_PORT}" -- echo Redis Server: "${REDIS_HOST}:${REDIS_PORT}" started
-	bootstrap_conf
 
 	#exec gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
 	if [ "${DISCOURSE_DONT_INIT_DATABASE}" != "true" ] ; then
@@ -101,25 +102,23 @@ if [[ "start" == *"$1"* ]]; then
 
 	tail -f log/* &
 
-	(
-		while true ; do
-			gosu "${RUNTIME_USER}" bundle config set RAILS_MAX_THREADS 3
-			RAILS_MAX_THREADS=3 gosu "${RUNTIME_USER}" bundle exec sidekiq -c 2 -v -L /dev/stdout -C config/sidekiq.yml -q low,2 -q critical,8 -q default,4 -q ultra_low
-		done
-	) &
-
 	sed -i s'/8, 32/4, 16/' config/puma.rb
 
 	exec gosu "${RUNTIME_USER}" bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
-elif [[ "bundle" == "$1" ]]; then
-	bootstrap_conf
+elif [[ "start-sidekiq" == "$1" ]]; then
+	/wait-for "${POSTGRES_HOST}:${POSTGRES_PORT}" -- echo DB "${POSTGRES_HOST}:${POSTGRES_PORT}" started
+	/wait-for "${REDIS_HOST}:${REDIS_PORT}" -- echo Redis Server: "${REDIS_HOST}:${REDIS_PORT}" started
 
+	tail -f log/* &
+
+	gosu "${RUNTIME_USER}" bundle config set RAILS_MAX_THREADS 3
+	RAILS_MAX_THREADS=3 gosu "${RUNTIME_USER}" bundle exec sidekiq -c 2 -v -L /dev/stdout -C config/sidekiq.yml -q low,2 -q critical,8 -q default,4 -q ultra_low
+elif [[ "bundle" == "$1" ]]; then
 	exec gosu "${RUNTIME_USER}" $@
 elif [[ "healthcheck" == "$1" ]]; then
 	nc -z -w5 127.0.0.1 "${DISCOURSE_PORT}" || exit 1
 	exit 0
 fi
 
-bootstrap_conf
 exec "$@"
 
