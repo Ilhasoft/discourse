@@ -95,6 +95,7 @@ if [[ "start" == *"$1"* ]]; then
 		echo 'SiteSetting.content_security_policy = false' | /docker-entrypoint.sh bundle exec rails c
 	fi
 	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" -a ! -f /discourse_precompiled ] ; then
+		uglifyjs '/app/public/assets/_vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' -m -c -o '/app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js.map'" > /app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js
 		gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
 		touch /discourse_precompiled
 	fi
@@ -112,7 +113,7 @@ elif [[ "start-sidekiq" == "$1" ]]; then
 	tail -f log/* &
 
 	gosu "${RUNTIME_USER}" bundle config set RAILS_MAX_THREADS 3
-	RAILS_MAX_THREADS=3 gosu "${RUNTIME_USER}" bundle exec sidekiq -c 2 -v -L /dev/stdout -C config/sidekiq.yml -q low,2 -q critical,8 -q default,4 -q ultra_low
+	RAILS_MAX_THREADS=3 exec gosu "${RUNTIME_USER}" bundle exec sidekiq -c 2 -v -L /dev/stdout -C config/sidekiq.yml -q low,2 -q critical,8 -q default,4 -q ultra_low
 elif [[ "bundle" == "$1" ]]; then
 	exec gosu "${RUNTIME_USER}" $@
 elif [[ "healthcheck" == "$1" ]]; then

@@ -5,7 +5,7 @@ FROM ruby:2.7.1-slim-buster AS base
 
 #ARG DISCOURSE_VERSION="master"
 ARG EXECJS_RUNTIME="Node"
-ARG DISCOURSE_VERSION="v2.5.6"
+ARG DISCOURSE_VERSION="v2.6.0"
 ARG BUNDLE_JOBS=6
 
 ARG NODE_BUILD_DEPS=""
@@ -108,7 +108,7 @@ LABEL discourse=${DISCOURSE_VERSION} \
     os.version="10" \
     name="Discourse ${DISCOURSE_VERSION}" \
     description="Discourse image" \
-    maintainer="Ilhasoft Team"
+    maintainer="Weni Team"
 
 RUN addgroup --gid "${DISCOURSE_GID}" discourse \
  && useradd --system -m -d /app -u "${DISCOURSE_UID}" -g "${DISCOURSE_GID}" discourse
