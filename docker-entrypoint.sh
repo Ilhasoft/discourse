@@ -96,7 +96,9 @@ if [[ "start" == *"$1"* ]]; then
 	fi
 	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" -a ! -f /discourse_precompiled ] ; then
 		gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
-		uglifyjs '/app/public/assets/_vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' -m -c -o '/app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js.map'" > /app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js
+		HASH_JS=$( basename $( ls /app/public/assets/_vendor-*.js | cut -f 2 -d '-' | head -n1 ) .js )
+		mkdir -p /app/public/assets/
+		uglifyjs "/app/public/assets/_vendor-${HASH_JS}.js" -m -c -o "/app/public/assets/vendor-${HASH_JS}.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-${HASH_JS}.js.map'" > "/app/public/assets/vendor-${HASH_JS}.js"
 		touch /discourse_precompiled
 	fi
 	#gosu "${RUNTIME_USER}" mailcatcher --http-ip 0.0.0.0
