@@ -95,8 +95,8 @@ if [[ "start" == *"$1"* ]]; then
 		echo 'SiteSetting.content_security_policy = false' | /docker-entrypoint.sh bundle exec rails c
 	fi
 	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" -a ! -f /discourse_precompiled ] ; then
-		uglifyjs '/app/public/assets/_vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' -m -c -o '/app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js.map'" > /app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js
 		gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
+		uglifyjs '/app/public/assets/_vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' -m -c -o '/app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js.map'" > /app/public/assets/vendor-465f30afbf27352b1a2f4a1691ce8e3b7fc8b313d565f88d3b0ae3fcee420a3d.js
 		touch /discourse_precompiled
 	fi
 	#gosu "${RUNTIME_USER}" mailcatcher --http-ip 0.0.0.0
