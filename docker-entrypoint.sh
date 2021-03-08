@@ -98,7 +98,7 @@ if [[ "start" == *"$1"* ]]; then
 		gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
 		HASH_JS=$( basename $( ls /app/public/assets/_vendor-*.js | cut -f 2 -d '-' | head -n1 ) .js )
 		mkdir -p /app/public/assets/
-		uglifyjs "/app/public/assets/_vendor-${HASH_JS}.js" -m -c -o "/app/public/assets/vendor-${HASH_JS}.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-${HASH_JS}.js.map'" > "/app/public/assets/vendor-${HASH_JS}.js"
+		uglifyjs "/app/public/assets/_vendor-${HASH_JS}.js" -m -c -o "/app/public/assets/vendor-${HASH_JS}.js" --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-${HASH_JS}.js.map'" > "/app/public/assets/vendor-${HASH_JS}.js"
 		touch /discourse_precompiled
 	fi
 	#gosu "${RUNTIME_USER}" mailcatcher --http-ip 0.0.0.0
