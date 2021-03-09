@@ -97,8 +97,10 @@ if [[ "start" == *"$1"* ]]; then
 	if [ "${DISCOURSE_DONT_PRECOMPILE}" != "true" -a ! -f /discourse_precompiled ] ; then
 		gosu "${RUNTIME_USER}" bundle exec rake assets:precompile
 		HASH_JS=$( basename $( ls /app/public/assets/_vendor-*.js | cut -f 2 -d '-' | head -n1 ) .js )
-		mkdir -p /app/public/assets/
+		#echo ${HASH_JS}
+		#ls /app/public/assets/
 		uglifyjs "/app/public/assets/_vendor-${HASH_JS}.js" -m -c -o "/app/public/assets/vendor-${HASH_JS}.js" --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-${HASH_JS}.js.map'" > "/app/public/assets/vendor-${HASH_JS}.js"
+		#uglifyjs '/app/public/assets/_vendor-6fe3dd0886b189b17813c93b9df752abc0a33c577423b9cb4bf449ee18401160.js' -m -c -o '/app/public/assets/vendor-6fe3dd0886b189b17813c93b9df752abc0a33c577423b9cb4bf449ee18401160.js' --source-map "base='/app/public/assets',root='/assets',url='/assets/vendor-6fe3dd0886b189b17813c93b9df752abc0a33c577423b9cb4bf449ee18401160.js.map'"
 		touch /discourse_precompiled
 	fi
 	#gosu "${RUNTIME_USER}" mailcatcher --http-ip 0.0.0.0
@@ -106,6 +108,7 @@ if [[ "start" == *"$1"* ]]; then
 	tail -f log/* &
 
 	sed -i s'/8, 32/4, 16/' config/puma.rb
+	sed -i s'/daemonize false/#daemonize false/' config/puma.rb
 
 	exec gosu "${RUNTIME_USER}" bundle exec rails server --binding="0.0.0.0" --port="${DISCOURSE_PORT}"
 elif [[ "start-sidekiq" == "$1" ]]; then
